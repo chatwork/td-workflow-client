@@ -1,0 +1,48 @@
+{
+  "name": "td-workflow-client",
+  "version": "1.0.0",
+  "description": "td-workflow-client",
+  "main": "index.js",
+  "repository": "github:chatwork/td-workflow-client",
+  "scripts": {
+    "lint": "tslint --fix src/**/*.ts",
+    "test": "npm run lint && jest --passWithNoTests",
+    "clean": "rm -rf dist/*"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.24",
+    "@types/chai": "^4.1.7",
+    "@types/jest": "^24.0.13",
+    "@types/node": "^10.14.4",
+    "aws-sdk": "^2.439.0",
+    "jest": "^24.7.1",
+    "prettier": "^1.17.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^6.0.3",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.4.3"
+  },
+  "jest": {
+    "globals": {},
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(tests?/.+(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "moment": "^2.24.0"
+  }
+}
