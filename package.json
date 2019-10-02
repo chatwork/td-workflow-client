@@ -10,7 +10,7 @@
     "clean": "rm -rf dist/*"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.24",
     "@types/chai": "^4.1.7",
