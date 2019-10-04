@@ -1,10 +1,10 @@
 # td-workflow-client
 
-AWS Lambda 用の TreasureData クライアントライブラリです。
+TreasureData クライアントライブラリです。
 
 ## 使い方
 
-./src/treasureData.ts を Typescript で書かれた Lambda プロジェクトにインポートします。
+./src/treasureData.ts を Typescript で書かれたプロジェクトにインポートします。
 
 ## Digdag API の仕様を調べる
 

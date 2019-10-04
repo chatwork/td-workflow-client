@@ -1,12 +1,7 @@
 'use strict';
-import * as AWS from 'aws-sdk';
 import moment from 'moment';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 export interface Option extends AxiosRequestConfig {}
-
-AWS.config.update({
-  region: process.env.AWS_REGION
-});
 
 export type TreasureDataSecret = {
   API_TOKEN: string;
@@ -112,18 +107,7 @@ export class TreasureData {
    * インスタンスを初期化する
    * @param {Secret} secret  (オプション)シークレット情報が既に判明している場合に指定
    */
-  public init = async (secret?: TreasureDataSecret): Promise<void> => {
-    if (!secret) {
-      // ChatworkBotのトークンを取得
-      const secretManager = new AWS.SecretsManager();
-      const secretJson = await secretManager
-        .getSecretValue({ SecretId: 'treasuredata/bot' })
-        .promise()
-        .then(value => {
-          return value.SecretString;
-        });
-      secret = JSON.parse(secretJson);
-    }
+  public init = async (secret: TreasureDataSecret): Promise<void> => {
     const option: Option = {
       baseURL: 'https://api-workflow.treasuredata.com',
       headers: {
