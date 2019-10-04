@@ -117,7 +117,7 @@ export class TreasureData {
       // ChatworkBotのトークンを取得
       const secretManager = new AWS.SecretsManager();
       const secretJson = await secretManager
-        .getSecretValue({ SecretId: 'treasuredata/bot' })
+        .getSecretValue({ SecretId: 'share/treasuredata/bot' })
         .promise()
         .then(value => {
           return value.SecretString;
