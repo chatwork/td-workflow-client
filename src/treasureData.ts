@@ -89,10 +89,28 @@ type TreasureDataGetWorkflowsOutputElement = {
   config: object;
 };
 
+class TreasureDataError extends Error {
+}
+
 export class TreasureData {
   private axios: AxiosInstance;
 
-  constructor() {}
+  constructor(secret: TreasureDataSecret) {
+    if (secret === undefined || !secret.API_TOKEN) {
+      throw new TreasureDataError('secret は必須です。');
+    }
+
+    const option: Option = {
+      baseURL: 'https://api-workflow.treasuredata.com',
+      headers: {
+        AUTHORIZATION: `TD1 ${secret.API_TOKEN}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    };
+
+    this.axios = axios.create(option);
+  }
 
   /**
    * axiosにのオブジェクトインスタンスを取得する
@@ -134,12 +152,14 @@ export class TreasureData {
 
     if (projectId === null) {
       throw new Error('指定の Project 名が見つかりません。');
+      throw new TreasureDataError('指定の Project 名が見つかりません。');
     }
 
     const workflowId = await this.getWorkflowId(workflowName, projectId);
 
     if (workflowId === null) {
       throw new Error('指定の Workflow 名が見つかりません。');
+      throw new TreasureDataError('指定の Workflow 名が見つかりません。');
     }
 
     const path = 'api/attempts';
@@ -153,6 +173,7 @@ export class TreasureData {
 
     if (result.status !== 200) {
       throw new Error('サーバーのレスポンスが不正です。');
+      throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
     return result.data as TreasureDataExecuteOutput;
@@ -170,6 +191,7 @@ export class TreasureData {
 
     if (result.status !== 200) {
       throw new Error('サーバーのレスポンスが不正です。');
+      throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
     return result.data as TreasureDataGetStatusOutput;
@@ -186,6 +208,7 @@ export class TreasureData {
 
     if (result.status !== 200) {
       throw new Error('サーバーのレスポンスが不正です。');
+      throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
     const json = result.data as TreasureDataGetProjectsOutput;
@@ -211,6 +234,7 @@ export class TreasureData {
 
     if (result.status !== 200) {
       throw new Error('サーバーのレスポンスが不正です。');
+      throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
     const json = result.data as TreasureDataGetWorkflowsOutput;
