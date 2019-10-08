@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import zlib from 'zlib';
+import tar from 'tar';
 import moment from 'moment';
 import uuid from 'uuid/v4';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
@@ -94,8 +94,7 @@ type TreasureDataGetWorkflowsOutputElement = {
   config: object;
 };
 
-class TreasureDataError extends Error {
-}
+class TreasureDataError extends Error {}
 
 export class TreasureData {
   private axios: AxiosInstance;
@@ -127,20 +126,46 @@ export class TreasureData {
   };
 
   /**
-   * インスタンスを初期化する
-   * @param {Secret} secret  (オプション)シークレット情報が既に判明している場合に指定
+   * Workflow を TreasureData 上にデプロイする
    */
-  public init = async (secret: TreasureDataSecret): Promise<void> => {
-    const option: Option = {
-      baseURL: 'https://api-workflow.treasuredata.com',
-      headers: {
-        AUTHORIZATION: `TD1 ${secret.API_TOKEN}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
+  public deployWorkflow = async (
+    srcFilePath: string,
+    projectName: string,
+    revision?: string
+  ): Promise<TreasureDataExecuteOutput> => {
+    const gzippedData = await this.gzipDigFile(srcFilePath);
+
+    if (revision === undefined) {
+      revision = uuid();
+    }
+
+    const config = {
+      params: {
+        project: projectName,
+        revision: revision
+      },
+      data: gzippedData
     };
 
-    this.axios = axios.create(option);
+    let result;
+    try {
+      await this.axios.interceptors.request.use(
+        (values: AxiosRequestConfig): AxiosRequestConfig => {
+          values.headers['Content-Type'] = 'application/gzip';
+          values.headers['Content-Encoding'] = 'gzip';
+          return values;
+        }
+      );
+      result = await this.axios.put('api/projects', config);
+    } catch (error) {
+      console.error(error);
+    }
+
+    if (result.status !== 200) {
+      throw new TreasureDataError('サーバーのレスポンスが不正です。');
+    }
+
+    return result.data as TreasureDataExecuteOutput;
   };
 
   /**
@@ -240,5 +265,45 @@ export class TreasureData {
     }
 
     return filtered[0].id;
+  };
+
+  /**
+   * 指定したワークフロー定義ファイルを読み込んで gzip 圧縮
+   * @param {string} srcFilePath  ワークフロー定義ファイルのパス
+   * @return {Buffer}             圧縮されたワークフロー定義ファイルのデータ
+   */
+  private gzipDigFile = async (srcFilePath: string, distDirPath?: string): Promise<Buffer> => {
+    // gzip 圧縮したファイルの保存先
+    if (distDirPath === undefined) {
+      distDirPath = process.cwd();
+    }
+    if (!fs.existsSync(path.resolve(distDirPath, srcFilePath))) {
+      throw new TreasureDataError('指定されたワークフロー定義ファイルが見つかりません。');
+    }
+    // 配置先の存在チェック
+    if (!fs.existsSync(distDirPath)) {
+      throw new TreasureDataError('gzip 圧縮したワークフロー定義ファイルの保存先が存在しません。');
+    }
+
+    try {
+      // ワークフロー定義ファイル名を取得
+      const parsedPaths = path.parse(srcFilePath);
+      // gzip 圧縮
+      const gzippedPath = path.join(distDirPath, `${parsedPaths.name}.tar.gz`);
+      await tar.create(
+        {
+          gzip: true,
+          cwd: parsedPaths.dir,
+          file: gzippedPath
+        },
+        [`${parsedPaths.base}`]
+      );
+
+      return fs.readFileSync(gzippedPath);
+    } catch (error) {
+      throw new TreasureDataError(
+        `指定されたワークフロー定義ファイルの gzip 圧縮に失敗しました。 error = ${error}`
+      );
+    }
   };
 }

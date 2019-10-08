@@ -6,7 +6,7 @@
   "repository": "github:chatwork/td-workflow-client",
   "scripts": {
     "lint": "tslint --fix src/**/*.ts",
-    "test": "npm run lint && jest --passWithNoTests",
+    "test": "npm run lint && jest --passWithNoTests --silent=false --verbose false",
     "clean": "rm -rf dist/*"
   },
   "author": "",
@@ -43,8 +43,10 @@
     ]
   },
   "dependencies": {
+    "@types/tar": "^4.0.3",
     "axios": "^0.19.0",
     "moment": "^2.24.0",
+    "tar": "^5.0.5",
     "uuid": "^3.3.3"
   }
 }

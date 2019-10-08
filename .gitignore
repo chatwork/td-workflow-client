@@ -1,5 +1,6 @@
 .DS_Store
 
+
 # Editor
 .idea/
 .vscode/
@@ -15,8 +16,14 @@ __pycache__/
 # Build directories
 dist
 
-# Layer directories
+# Achive Files
 *.zip
+*.tar.gz
+*.tgz
 
 # Coverage directories
 coverage/
+
+# Workflow files
+*.dig
+!test/workflows/*.dig
