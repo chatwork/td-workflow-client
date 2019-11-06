@@ -1,7 +1,6 @@
 'use strict';
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs-extra';
 import tar from 'tar';
 import moment from 'moment';
 import uuid from 'uuid/v4';
@@ -129,23 +128,16 @@ export class TreasureData {
    * Workflow を TreasureData 上にデプロイする
    */
   public deployWorkflow = async (
-    srcFilePath: string,
+    srcDirPath: string,
+    zipFilePath: string,
     projectName: string,
     revision?: string
   ): Promise<TreasureDataExecuteOutput> => {
-    const gzippedData = await this.gzipDigFile(srcFilePath);
+    const gzipData = await this.gzipDigFile(srcDirPath, zipFilePath);
 
     if (revision === undefined) {
       revision = uuid();
     }
-
-    const config = {
-      params: {
-        project: projectName,
-        revision: revision
-      },
-      data: gzippedData
-    };
 
     let result;
     try {
@@ -156,7 +148,10 @@ export class TreasureData {
           return values;
         }
       );
-      result = await this.axios.put('api/projects', config);
+      result = await this.axios.put(
+        `api/projects?project=${projectName}&revision=${revision}`,
+        gzipData
+      );
     } catch (error) {
       console.error(error);
     }
@@ -269,41 +264,59 @@ export class TreasureData {
 
   /**
    * 指定したワークフロー定義ファイルを読み込んで gzip 圧縮
-   * @param {string} srcFilePath  ワークフロー定義ファイルのパス
+   * @param {string} srcDirPath  ワークフロー定義ファイルのパス
    * @return {Buffer}             圧縮されたワークフロー定義ファイルのデータ
    */
-  private gzipDigFile = async (srcFilePath: string, distDirPath?: string): Promise<Buffer> => {
+  private gzipDigFile = async (srcDirPath: string, zipFilePath?: string): Promise<Buffer> => {
     // gzip 圧縮したファイルの保存先
-    if (distDirPath === undefined) {
-      distDirPath = process.cwd();
+    if (zipFilePath === undefined) {
+      zipFilePath = process.cwd();
     }
-    if (!fs.existsSync(path.resolve(distDirPath, srcFilePath))) {
+    if (!fs.existsSync(srcDirPath)) {
       throw new TreasureDataError('指定されたワークフロー定義ファイルが見つかりません。');
     }
-    // 配置先の存在チェック
-    if (!fs.existsSync(distDirPath)) {
-      throw new TreasureDataError('gzip 圧縮したワークフロー定義ファイルの保存先が存在しません。');
-    }
+
+    const fileList = this.getFileList(srcDirPath);
 
     try {
-      // ワークフロー定義ファイル名を取得
-      const parsedPaths = path.parse(srcFilePath);
-      // gzip 圧縮
-      const gzippedPath = path.join(distDirPath, `${parsedPaths.name}.tar.gz`);
       await tar.create(
         {
           gzip: true,
-          cwd: parsedPaths.dir,
-          file: gzippedPath
+          cwd: srcDirPath,
+          file: zipFilePath,
+          portable: true
         },
-        [`${parsedPaths.base}`]
+        fileList
       );
 
-      return fs.readFileSync(gzippedPath);
+      return fs.readFileSync(zipFilePath);
     } catch (error) {
       throw new TreasureDataError(
         `指定されたワークフロー定義ファイルの gzip 圧縮に失敗しました。 error = ${error}`
       );
     }
+  };
+
+  private getFileList = (srcDirPath: string): string[] => {
+    return this.getFileListRecursive(srcDirPath);
+  };
+
+  private getFileListRecursive = (srcDirPath: string, path: string = ''): string[] => {
+    const result: string[] = [];
+    const fileObj = fs.readdirSync(`${srcDirPath}/${path}`, { withFileTypes: true });
+    fileObj.forEach(file => {
+      if (file.isDirectory()) {
+        this.getFileListRecursive(
+          srcDirPath,
+          path === '' ? file.name : `${path}/${file.name}`
+        ).forEach(item => {
+          result.push(item);
+        });
+      } else {
+        result.push(path === '' ? file.name : `${path}/${file.name}`);
+      }
+    });
+
+    return result;
   };
 }
