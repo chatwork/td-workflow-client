@@ -1,5 +1,6 @@
 'use strict';
 import tar from 'tar';
+import path from 'path';
 import moment from 'moment';
 import uuid from 'uuid/v4';
 import * as fs from 'fs-extra';
@@ -65,7 +66,7 @@ type TreasureDataGetProjectsOutput = {
   projects: TreasureDataGetProjectsOutputElement[];
 };
 
-type TreasureDataGetProjectsOutputElement = {
+export type TreasureDataGetProjectsOutputElement = {
   id: string;
   name: string;
   revision: string;
@@ -278,6 +279,10 @@ export class TreasureData {
     const fileList = this.getFileList(srcDirPath);
 
     try {
+      const destPath = path.parse(zipFilePath);
+
+      fs.mkdirsSync(destPath.dir);
+
       await tar.create(
         {
           gzip: true,

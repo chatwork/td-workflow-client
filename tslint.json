@@ -1,8 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint-config-prettier"],
   "jsRules": {},
   "rules": {
     "encoding": true,
@@ -12,12 +10,7 @@
     "no-string-throw": true,
     "triple-equals": true,
     "class-name": true,
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore"
-    ],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
     "prettier": [
       true,
       {

@@ -2,11 +2,12 @@
   "name": "td-workflow-client",
   "version": "1.1.0",
   "description": "td-workflow-client",
-  "main": "index.js",
+  "main": "dist/treasureData.js",
   "repository": "github:chatwork/td-workflow-client",
   "scripts": {
     "lint": "tslint --fix src/**/*.ts",
     "test": "npm run lint && jest --passWithNoTests --silent=false --verbose false",
+    "build": "npm run clean && npm run test && tsc",
     "clean": "rm -rf dist/*"
   },
   "author": "",
@@ -14,8 +15,10 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.24",
     "@types/chai": "^4.1.7",
+    "@types/fs-extra": "^8.0.1",
     "@types/jest": "^24.0.13",
     "@types/node": "^10.14.4",
+    "@types/tar": "^4.0.3",
     "aws-sdk": "^2.439.0",
     "axios-mock-adapter": "^1.17.0",
     "jest": "^24.7.1",
@@ -43,7 +46,6 @@
     ]
   },
   "dependencies": {
-    "@types/tar": "^4.0.3",
     "axios": "^0.19.0",
     "fs-extra": "^8.1.0",
     "moment": "^2.24.0",
