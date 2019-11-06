@@ -1,6 +1,6 @@
 'use strict';
 
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import tar from 'tar';
 import moment from 'moment';
 import uuid from 'uuid/v4';
