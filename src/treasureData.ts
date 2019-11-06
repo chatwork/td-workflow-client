@@ -1,9 +1,8 @@
 'use strict';
-
-import * as fs from 'fs-extra';
 import tar from 'tar';
 import moment from 'moment';
 import uuid from 'uuid/v4';
+import * as fs from 'fs-extra';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 export interface Option extends AxiosRequestConfig {}
 
