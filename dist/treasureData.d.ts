@@ -90,6 +90,14 @@ export declare class TreasureData {
      */
     getWorkflowStatus: (sessionId: string) => Promise<TreasureDataGetStatusOutput>;
     /**
+     * 指定した Project にシークレットを登録する
+     * @param {string} projectName TreasureData Workflow の対象のプロジェクト名
+     * @param {string} secretKey   シークレットの識別子
+     * @param {string} secretValue シークレットの値
+     * @return {Promise<void>}
+     */
+    setSecret: (projectName: string, key: string, value: string) => Promise<TreasureDataGetStatusOutput>;
+    /**
      * 指定したプロジェクトの ID を取得する
      * @param {string} name 指定するプロジェクト名
      * @return {string}     プロジェクト ID。見つからなければ null を返す
@@ -108,6 +116,17 @@ export declare class TreasureData {
      * @return {Buffer}             圧縮されたワークフロー定義ファイルのデータ
      */
     private gzipDigFile;
+    /**
+     * 指定ディレクトリ配下のファイル一覧を取得する
+     * @param {string} srcDirPath   ファイル一覧を取得するディレクトリパス
+     * @return {string[]}           配下のファイルパスの配列
+     */
     private getFileList;
+    /**
+     * 指定ディレクトリ配下のファイル一覧を再帰的に取得する
+     * @param {string} srcDirPath   ファイル一覧を取得するディレクトリパス
+     * @param {string} path         srcDirPath 以下のディレクトリパス
+     * @return {string[]}           配下のファイルパスの配列
+     */
     private getFileListRecursive;
 }

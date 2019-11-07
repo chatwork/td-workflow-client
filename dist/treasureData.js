@@ -92,6 +92,27 @@ class TreasureData {
             return result.data;
         };
         /**
+         * 指定した Project にシークレットを登録する
+         * @param {string} projectName TreasureData Workflow の対象のプロジェクト名
+         * @param {string} secretKey   シークレットの識別子
+         * @param {string} secretValue シークレットの値
+         * @return {Promise<void>}
+         */
+        this.setSecret = async (projectName, key, value) => {
+            const projectId = await this.getProjectId(projectName);
+            if (projectId === null) {
+                throw new TreasureDataError('指定の Project 名が見つかりません。');
+            }
+            const param = {
+                value: value
+            };
+            const result = await this.axios.put(`api/projects/${projectId}/secrets/${key}`, param);
+            if (result.status !== 200) {
+                throw new TreasureDataError('サーバーのレスポンスが不正です。');
+            }
+            return;
+        };
+        /**
          * 指定したプロジェクトの ID を取得する
          * @param {string} name 指定するプロジェクト名
          * @return {string}     プロジェクト ID。見つからなければ null を返す
@@ -155,9 +176,20 @@ class TreasureData {
                 throw new TreasureDataError(`指定されたワークフロー定義ファイルの gzip 圧縮に失敗しました。 error = ${error}`);
             }
         };
+        /**
+         * 指定ディレクトリ配下のファイル一覧を取得する
+         * @param {string} srcDirPath   ファイル一覧を取得するディレクトリパス
+         * @return {string[]}           配下のファイルパスの配列
+         */
         this.getFileList = (srcDirPath) => {
             return this.getFileListRecursive(srcDirPath);
         };
+        /**
+         * 指定ディレクトリ配下のファイル一覧を再帰的に取得する
+         * @param {string} srcDirPath   ファイル一覧を取得するディレクトリパス
+         * @param {string} path         srcDirPath 以下のディレクトリパス
+         * @return {string[]}           配下のファイルパスの配列
+         */
         this.getFileListRecursive = (srcDirPath, path = '') => {
             const result = [];
             const fileObj = fs.readdirSync(`${srcDirPath}/${path}`, { withFileTypes: true });
