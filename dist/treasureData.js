@@ -61,9 +61,14 @@ class TreasureData {
          * 指定の Workflow を実行する
          * @param {string} projectName  TreasureData Workflow の対象のプロジェクト名
          * @param {string} workflowName TreasureData Workflow の対象の Workflow 名
+         * @param {Date} scheduleDate   起動する日時 (option)
          * @return {Promise<TreasureDataExecuteOutput>}
          */
-        this.executeWorkflow = async (projectName, workflowName) => {
+        this.executeWorkflow = async (projectName, workflowName, scheduleDate) => {
+            const date = moment_1.default(scheduleDate);
+            if (!date.isSameOrAfter(moment_1.default())) {
+                throw new TreasureDataError('予約日時が過去です。');
+            }
             const projectId = await this.getProjectId(projectName);
             if (projectId === null) {
                 throw new TreasureDataError('指定の Project 名が見つかりません。');
@@ -73,7 +78,7 @@ class TreasureData {
                 throw new TreasureDataError('指定の Workflow 名が見つかりません。');
             }
             const params = {
-                sessionTime: moment_1.default().toISOString(),
+                sessionTime: moment_1.default(scheduleDate).toISOString(),
                 workflowId: workflowId,
                 params: {}
             };

@@ -81,9 +81,10 @@ export declare class TreasureData {
      * 指定の Workflow を実行する
      * @param {string} projectName  TreasureData Workflow の対象のプロジェクト名
      * @param {string} workflowName TreasureData Workflow の対象の Workflow 名
+     * @param {Date} scheduleDate   起動する日時 (option)
      * @return {Promise<TreasureDataExecuteOutput>}
      */
-    executeWorkflow: (projectName: string, workflowName: string) => Promise<TreasureDataExecuteOutput>;
+    executeWorkflow: (projectName: string, workflowName: string, scheduleDate?: Date) => Promise<TreasureDataExecuteOutput>;
     /**
      * 指定した Workflow のステータスを取得する
      * @param {string} sessionId 指定する Workflow の Session ID

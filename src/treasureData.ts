@@ -172,12 +172,18 @@ export class TreasureData {
    * 指定の Workflow を実行する
    * @param {string} projectName  TreasureData Workflow の対象のプロジェクト名
    * @param {string} workflowName TreasureData Workflow の対象の Workflow 名
+   * @param {Date} scheduleDate   起動する日時 (option)
    * @return {Promise<TreasureDataExecuteOutput>}
    */
   public executeWorkflow = async (
     projectName: string,
-    workflowName: string
+    workflowName: string,
+    scheduleDate?: Date
   ): Promise<TreasureDataExecuteOutput> => {
+    const date = moment(scheduleDate);
+    if (!date.isSameOrAfter(moment())) {
+      throw new TreasureDataError('予約日時が過去です。');
+    }
     const projectId = await this.getProjectId(projectName);
 
     if (projectId === null) {
@@ -191,7 +197,7 @@ export class TreasureData {
     }
 
     const params = {
-      sessionTime: moment().toISOString(),
+      sessionTime: moment(scheduleDate).toISOString(),
       workflowId: workflowId,
       params: {}
     };
