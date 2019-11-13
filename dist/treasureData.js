@@ -38,18 +38,16 @@ class TreasureData {
             }
             let result;
             try {
-                await this.axios.interceptors.request.use((values) => {
-                    values.headers['Content-Type'] = 'application/gzip';
-                    values.headers['Content-Encoding'] = 'gzip';
-                    return values;
-                });
-                result = await this.axios.put(`api/projects?project=${projectName}&revision=${revision}`, gzipData);
-                // 設定をもとに戻す
-                await this.axios.interceptors.request.use((values) => {
-                    values.headers['Content-Type'] = 'application/json';
-                    values.headers['Content-Encoding'] = undefined;
-                    return values;
-                });
+                const option = {
+                    baseURL: this.option.baseURL,
+                    headers: {
+                        AUTHORIZATION: this.option.headers['AUTHORIZATION'],
+                        'Content-Type': 'application/gzip',
+                        'Content-Encoding': 'gzip',
+                        Accept: 'application/json'
+                    }
+                };
+                result = await this.axios.put(`api/projects?project=${projectName}&revision=${revision}`, gzipData, option);
             }
             catch (error) {
                 console.error(error);
@@ -214,7 +212,7 @@ class TreasureData {
         if (secret === undefined || !secret.API_TOKEN) {
             throw new TreasureDataError('secret は必須です。');
         }
-        const option = {
+        this.option = {
             baseURL: 'https://api-workflow.treasuredata.com',
             headers: {
                 AUTHORIZATION: `TD1 ${secret.API_TOKEN}`,
@@ -222,7 +220,7 @@ class TreasureData {
                 Accept: 'application/json'
             }
         };
-        this.axios = axios_1.default.create(option);
+        this.axios = axios_1.default.create(this.option);
     }
 }
 exports.TreasureData = TreasureData;

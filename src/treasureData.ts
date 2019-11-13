@@ -96,14 +96,15 @@ type TreasureDataGetWorkflowsOutputElement = {
 class TreasureDataError extends Error {}
 
 export class TreasureData {
-  private axios: AxiosInstance;
+  private readonly axios: AxiosInstance;
+  private readonly option: AxiosRequestConfig;
 
   constructor(secret: TreasureDataSecret) {
     if (secret === undefined || !secret.API_TOKEN) {
       throw new TreasureDataError('secret は必須です。');
     }
 
-    const option: Option = {
+    this.option = {
       baseURL: 'https://api-workflow.treasuredata.com',
       headers: {
         AUTHORIZATION: `TD1 ${secret.API_TOKEN}`,
@@ -112,7 +113,7 @@ export class TreasureData {
       }
     };
 
-    this.axios = axios.create(option);
+    this.axios = axios.create(this.option);
   }
 
   /**
@@ -141,25 +142,20 @@ export class TreasureData {
 
     let result;
     try {
-      await this.axios.interceptors.request.use(
-        (values: AxiosRequestConfig): AxiosRequestConfig => {
-          values.headers['Content-Type'] = 'application/gzip';
-          values.headers['Content-Encoding'] = 'gzip';
-          return values;
+      const option: AxiosRequestConfig = {
+        baseURL: this.option.baseURL,
+        headers: {
+          AUTHORIZATION: this.option.headers['AUTHORIZATION'],
+          'Content-Type': 'application/gzip',
+          'Content-Encoding': 'gzip',
+          Accept: 'application/json'
         }
-      );
+      };
+
       result = await this.axios.put(
         `api/projects?project=${projectName}&revision=${revision}`,
-        gzipData
-      );
-
-      // 設定をもとに戻す
-      await this.axios.interceptors.request.use(
-        (values: AxiosRequestConfig): AxiosRequestConfig => {
-          values.headers['Content-Type'] = 'application/json';
-          values.headers['Content-Encoding'] = undefined;
-          return values;
-        }
+        gzipData,
+        option
       );
     } catch (error) {
       console.error(error);

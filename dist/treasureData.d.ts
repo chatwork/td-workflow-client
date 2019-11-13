@@ -64,7 +64,8 @@ export declare type TreasureDataGetProjectsOutputElement = {
     archiveMd5: string;
 };
 export declare class TreasureData {
-    private axios;
+    private readonly axios;
+    private readonly option;
     constructor(secret: TreasureDataSecret);
     /**
      * axiosにのオブジェクトインスタンスを取得する
