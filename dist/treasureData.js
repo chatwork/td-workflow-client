@@ -111,7 +111,7 @@ class TreasureData {
                 value: value
             };
             const result = await this.axios.put(`api/projects/${projectId}/secrets/${key}`, param);
-            if (result.status !== 200) {
+            if (result.status !== 204) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
             }
             return;
