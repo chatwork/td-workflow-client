@@ -51,6 +51,7 @@ class TreasureData {
             }
             catch (error) {
                 console.error(error);
+                throw new Error(error);
             }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
@@ -85,6 +86,7 @@ class TreasureData {
             }
             catch (error) {
                 console.error(error);
+                throw new Error(error);
             }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
@@ -103,6 +105,7 @@ class TreasureData {
             }
             catch (error) {
                 console.error(error);
+                throw new Error(error);
             }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
@@ -130,6 +133,7 @@ class TreasureData {
             }
             catch (error) {
                 console.error(error);
+                throw new Error(error);
             }
             if (result.status !== 204) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
@@ -148,6 +152,7 @@ class TreasureData {
             }
             catch (error) {
                 console.error(error);
+                throw new Error(error);
             }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
@@ -172,6 +177,7 @@ class TreasureData {
             }
             catch (error) {
                 console.error(error);
+                throw new Error(error);
             }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');

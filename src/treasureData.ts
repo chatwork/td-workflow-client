@@ -159,6 +159,7 @@ export class TreasureData {
       );
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
 
     if (result.status !== 200) {
@@ -203,6 +204,7 @@ export class TreasureData {
       result = await this.axios.put('api/attempts', params);
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
 
     if (result.status !== 200) {
@@ -223,6 +225,7 @@ export class TreasureData {
       result = await this.axios.get(`api/sessions/${sessionId}`);
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
 
     if (result.status !== 200) {
@@ -259,6 +262,7 @@ export class TreasureData {
       result = await this.axios.put(`api/projects/${projectId}/secrets/${key}`, param);
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
 
     if (result.status !== 204) {
@@ -279,6 +283,7 @@ export class TreasureData {
       result = await this.axios.get('api/projects');
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
 
     if (result.status !== 200) {
@@ -308,6 +313,7 @@ export class TreasureData {
       result = await this.axios.get(`api/projects/${projectId}/workflows`);
     } catch (error) {
       console.error(error);
+      throw new Error(error);
     }
 
     if (result.status !== 200) {
