@@ -66,7 +66,7 @@ class TreasureData {
          */
         this.executeWorkflow = async (projectName, workflowName, scheduleDate) => {
             const date = moment_1.default(scheduleDate);
-            if (!date.isSameOrAfter(moment_1.default())) {
+            if (date.isBefore(moment_1.default())) {
                 throw new TreasureDataError('予約日時が過去です。');
             }
             const projectId = await this.getProjectId(projectName);

@@ -181,7 +181,7 @@ export class TreasureData {
     scheduleDate?: Date
   ): Promise<TreasureDataExecuteOutput> => {
     const date = moment(scheduleDate);
-    if (!date.isSameOrAfter(moment())) {
+    if (date.isBefore(moment())) {
       throw new TreasureDataError('予約日時が過去です。');
     }
     const projectId = await this.getProjectId(projectName);
