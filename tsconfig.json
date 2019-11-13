@@ -9,5 +9,5 @@
     "declaration": true,
     "module": "commonjs"
   },
-  "exclude": ["node_modules", "test"]
+  "exclude": ["node_modules", "test", "dist"]
 }

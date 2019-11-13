@@ -44,6 +44,12 @@ class TreasureData {
                     return values;
                 });
                 result = await this.axios.put(`api/projects?project=${projectName}&revision=${revision}`, gzipData);
+                // 設定をもとに戻す
+                await this.axios.interceptors.request.use((values) => {
+                    values.headers['Content-Type'] = 'application/json';
+                    values.headers['Content-Encoding'] = undefined;
+                    return values;
+                });
             }
             catch (error) {
                 console.error(error);
