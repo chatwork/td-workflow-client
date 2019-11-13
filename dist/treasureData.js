@@ -73,11 +73,19 @@ class TreasureData {
                 throw new TreasureDataError('指定の Workflow 名が見つかりません。');
             }
             const params = {
-                sessionTime: moment_1.default().toISOString(),
+                sessionTime: moment_1.default()
+                    .add(10, 'second')
+                    .toISOString(),
                 workflowId: workflowId,
                 params: {}
             };
-            const result = await this.axios.put('api/attempts', params);
+            let result;
+            try {
+                result = await this.axios.put('api/attempts', params);
+            }
+            catch (error) {
+                console.error(error);
+            }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
             }
@@ -89,7 +97,13 @@ class TreasureData {
          * @return {Promise<TreasureDataExecuteOutput>}
          */
         this.getWorkflowStatus = async (sessionId) => {
-            const result = await this.axios.get(`api/sessions/${sessionId}`);
+            let result;
+            try {
+                result = await this.axios.get(`api/sessions/${sessionId}`);
+            }
+            catch (error) {
+                console.error(error);
+            }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
             }
@@ -110,7 +124,13 @@ class TreasureData {
             const param = {
                 value: value
             };
-            const result = await this.axios.put(`api/projects/${projectId}/secrets/${key}`, param);
+            let result;
+            try {
+                result = await this.axios.put(`api/projects/${projectId}/secrets/${key}`, param);
+            }
+            catch (error) {
+                console.error(error);
+            }
             if (result.status !== 204) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
             }
@@ -122,7 +142,13 @@ class TreasureData {
          * @return {string}     プロジェクト ID。見つからなければ null を返す
          */
         this.getProjectId = async (name) => {
-            const result = await this.axios.get('api/projects');
+            let result;
+            try {
+                result = await this.axios.get('api/projects');
+            }
+            catch (error) {
+                console.error(error);
+            }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
             }
@@ -140,7 +166,13 @@ class TreasureData {
          * @return {string}          workflow の ID。見つからなければ null を返す
          */
         this.getWorkflowId = async (name, projectId) => {
-            const result = await this.axios.get(`api/projects/${projectId}/workflows`);
+            let result;
+            try {
+                result = await this.axios.get(`api/projects/${projectId}/workflows`);
+            }
+            catch (error) {
+                console.error(error);
+            }
             if (result.status !== 200) {
                 throw new TreasureDataError('サーバーのレスポンスが不正です。');
             }
