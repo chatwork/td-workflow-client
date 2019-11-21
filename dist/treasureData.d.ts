@@ -48,24 +48,25 @@ export declare type TreasureDataGetExecutedWorkflowStatusOutput = {
     createdAt: string;
     finishedAt: string;
 };
+export interface TreasureDataGetExecutedWorkflowTasksOutputElement {
+    id: string;
+    fullName: string;
+    parentId: string;
+    config: object;
+    upstreams: string[];
+    state: string;
+    cancelRequested: false;
+    exportParams: object;
+    storeParams: object;
+    stateParams: object;
+    updatedAt: string;
+    retryAt: string;
+    startedAt: string;
+    error: object;
+    isGroup: boolean;
+}
 export interface TreasureDataGetExecutedWorkflowTasksOutput {
-    tasks: {
-        id: string;
-        fullName: string;
-        parentId: string;
-        config: object;
-        upstreams: string[];
-        state: string;
-        cancelRequested: false;
-        exportParams: object;
-        storeParams: object;
-        stateParams: object;
-        updatedAt: string;
-        retryAt: string;
-        startedAt: string;
-        error: object;
-        isGroup: boolean;
-    }[];
+    tasks: TreasureDataGetExecutedWorkflowTasksOutputElement[];
 }
 export declare type TreasureDataGetProjectsOutputElement = {
     id: string;

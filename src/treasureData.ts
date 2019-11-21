@@ -56,25 +56,25 @@ export type TreasureDataGetExecutedWorkflowStatusOutput = {
   createdAt: string;
   finishedAt: string;
 };
-
+export interface TreasureDataGetExecutedWorkflowTasksOutputElement {
+  id: string;
+  fullName: string;
+  parentId: string;
+  config: object; // Workflow ごとに設定内容は異なる
+  upstreams: string[];
+  state: string;
+  cancelRequested: false;
+  exportParams: object; // Workflow ごとに設定内容は異なる
+  storeParams: object;
+  stateParams: object;
+  updatedAt: string; //  ISO8601 format
+  retryAt: string; //  ISO8601 format
+  startedAt: string; //  ISO8601 format
+  error: object;
+  isGroup: boolean;
+}
 export interface TreasureDataGetExecutedWorkflowTasksOutput {
-  tasks: {
-    id: string;
-    fullName: string;
-    parentId: string;
-    config: object; // Workflow ごとに設定内容は異なる
-    upstreams: string[];
-    state: string;
-    cancelRequested: false;
-    exportParams: object; // Workflow ごとに設定内容は異なる
-    storeParams: object;
-    stateParams: object;
-    updatedAt: string; //  ISO8601 format
-    retryAt: string; //  ISO8601 format
-    startedAt: string; //  ISO8601 format
-    error: object;
-    isGroup: boolean;
-  }[];
+  tasks: TreasureDataGetExecutedWorkflowTasksOutputElement[];
 }
 
 type TreasureDataGetProjectsOutput = {
