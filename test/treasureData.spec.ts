@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import {
   TreasureData as TDWorkflow,
   TreasureDataSecret,
-  TreasureDataGetStatusOutput,
+  TreasureDataGetExecutedWorkflowStatusOutput,
   TreasureDataGetProjectsOutputElement
 } from '../src/treasureData';
 
@@ -27,40 +27,35 @@ describe('TDWorkflow', () => {
     it('Success.', async () => {
       tdw = new TDWorkflow(secret);
 
-      const sessionId = '13472853';
-      const result: TreasureDataGetStatusOutput = {
-        id: '123456789',
+      const attemptId = '13472853';
+      const result: TreasureDataGetExecutedWorkflowStatusOutput = {
+        id: '13472853',
+        index: 1,
         project: {
-          id: '123456',
-          name: 'test-pj'
+          id: '252525',
+          name: 'hogehoge'
         },
         workflow: {
-          name: 'test-wf',
-          id: '123456'
+          name: 'test_workflow_pj',
+          id: '121212121'
         },
-        sessionUuid: '7ef19574-ca23-48fb-828d-aa7cd9da37d4',
-        sessionTime: '123456789',
-        lastAttempt: {
-          id: '123456789',
-          retryAttemptName: 'test-wf',
-          done: false,
-          success: false,
-          cancelRequested: false,
-          params: {
-            last_session_time: '2014-10-10T13:50:40Z', //          ISO8601 format
-            next_session_time: '2014-10-10T13:50:40Z', //          ISO8601 format
-            last_executed_session_time: '2014-10-10T13:50:40Z' // ISO8601 format
-          },
-          createdAt: '2014-10-10T13:50:40Z', //  ISO8601 format
-          finishedAt: '2014-10-10T13:50:40Z' // ISO8601 format
-        }
+        sessionId: '12341234',
+        sessionUuid: 'q23r32rq23ro[k[poiu[iag',
+        sessionTime: '2019-11-14T16:07:20+09:00',
+        retryAttemptName: null,
+        done: true,
+        success: true,
+        cancelRequested: false,
+        params: {},
+        createdAt: '2019-11-14T07:07:10Z',
+        finishedAt: '2019-11-14T07:21:32Z'
       };
 
       // axios.getをモック
-      mockAxios.onGet(`api/sessions/${sessionId}`).reply(200, result);
+      mockAxios.onGet(`api/attempts/${attemptId}`).reply(200, result);
 
-      const response = await tdw.getWorkflowStatus('13472853');
-      expect(response.sessionUuid).toBe('7ef19574-ca23-48fb-828d-aa7cd9da37d4');
+      const response = await tdw.getExecutedWorkflowStatus('13472853');
+      expect(response.sessionUuid).toBe('q23r32rq23ro[k[poiu[iag');
     });
   });
 

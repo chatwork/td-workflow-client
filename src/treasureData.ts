@@ -11,7 +11,7 @@ export type TreasureDataSecret = {
   API_TOKEN: string;
 };
 
-export type TreasureDataExecuteOutput = {
+export type TreasureDataExecutedWorkflowOutput = {
   id: string;
   index: number;
   project: {
@@ -34,8 +34,9 @@ export type TreasureDataExecuteOutput = {
   finishedAt: string; // ISO8601 format
 };
 
-export type TreasureDataGetStatusOutput = {
+export type TreasureDataGetExecutedWorkflowStatusOutput = {
   id: string;
+  index: number;
   project: {
     id: string;
     name: string;
@@ -44,23 +45,37 @@ export type TreasureDataGetStatusOutput = {
     name: string;
     id: string;
   };
+  sessionId: string;
   sessionUuid: string;
   sessionTime: string;
-  lastAttempt: {
-    id: string;
-    retryAttemptName: string;
-    done: boolean;
-    success: boolean;
-    cancelRequested: boolean;
-    params: {
-      last_session_time: string; //          ISO8601 format
-      next_session_time: string; //          ISO8601 format
-      last_executed_session_time: string; // ISO8601 format
-    };
-    createdAt: string; //  ISO8601 format
-    finishedAt: string; // ISO8601 format
-  };
+  retryAttemptName: string;
+  done: boolean;
+  success: boolean;
+  cancelRequested: boolean;
+  params: object;
+  createdAt: string;
+  finishedAt: string;
 };
+
+export interface TreasureDataGetExecutedWorkflowTasksOutput {
+  tasks: {
+    id: string;
+    fullName: string;
+    parentId: string;
+    config: object; // Workflow ごとに設定内容は異なる
+    upstreams: string[];
+    state: string;
+    cancelRequested: false;
+    exportParams: object; // Workflow ごとに設定内容は異なる
+    storeParams: object;
+    stateParams: object;
+    updatedAt: string; //  ISO8601 format
+    retryAt: string; //  ISO8601 format
+    startedAt: string; //  ISO8601 format
+    error: object;
+    isGroup: boolean;
+  }[];
+}
 
 type TreasureDataGetProjectsOutput = {
   projects: TreasureDataGetProjectsOutputElement[];
@@ -133,7 +148,7 @@ export class TreasureData {
     zipFilePath: string,
     projectName: string,
     revision?: string
-  ): Promise<TreasureDataExecuteOutput> => {
+  ): Promise<TreasureDataExecutedWorkflowOutput> => {
     const gzipData = await this.gzipDigFile(srcDirPath, zipFilePath);
 
     if (revision === undefined) {
@@ -166,19 +181,19 @@ export class TreasureData {
       throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
-    return result.data as TreasureDataExecuteOutput;
+    return result.data as TreasureDataExecutedWorkflowOutput;
   };
 
   /**
    * 指定の Workflow を実行する
    * @param {string} projectName  TreasureData Workflow の対象のプロジェクト名
    * @param {string} workflowName TreasureData Workflow の対象の Workflow 名
-   * @return {Promise<TreasureDataExecuteOutput>}
+   * @return {Promise<TreasureDataExecutedWorkflowOutput>}
    */
   public executeWorkflow = async (
     projectName: string,
     workflowName: string
-  ): Promise<TreasureDataExecuteOutput> => {
+  ): Promise<TreasureDataExecutedWorkflowOutput> => {
     const projectId = await this.getProjectId(projectName);
 
     if (projectId === null) {
@@ -211,18 +226,20 @@ export class TreasureData {
       throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
-    return result.data as TreasureDataExecuteOutput;
+    return result.data as TreasureDataExecutedWorkflowOutput;
   };
 
   /**
    * 指定した Workflow のステータスを取得する
-   * @param {string} sessionId 指定する Workflow の Session ID
-   * @return {Promise<TreasureDataExecuteOutput>}
+   * @param {string} attemptId 指定する Workflow の Attempt ID
+   * @return {Promise<TreasureDataExecutedWorkflowOutput>}
    */
-  public getWorkflowStatus = async (sessionId: string): Promise<TreasureDataGetStatusOutput> => {
+  public getExecutedWorkflowStatus = async (
+    attemptId: string
+  ): Promise<TreasureDataGetExecutedWorkflowStatusOutput> => {
     let result;
     try {
-      result = await this.axios.get(`api/sessions/${sessionId}`);
+      result = await this.axios.get(`/api/attempts/${attemptId}`);
     } catch (error) {
       console.error(error);
       throw new Error(error);
@@ -232,7 +249,30 @@ export class TreasureData {
       throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
-    return result.data as TreasureDataGetStatusOutput;
+    return result.data as TreasureDataGetExecutedWorkflowStatusOutput;
+  };
+
+  /**
+   * 指定した Workflow のステータスを取得する
+   * @param {string} attemptId 指定する Workflow の Attempt ID
+   * @return {Promise<TreasureDataGetExecutedWorkflowTasksOutput>}
+   */
+  public getExecutedWorkflowTasks = async (
+    attemptId: string
+  ): Promise<TreasureDataGetExecutedWorkflowTasksOutput> => {
+    let result;
+    try {
+      result = await this.axios.get(`/api/attempts/${attemptId}/tasks`);
+    } catch (error) {
+      console.error(error);
+      throw new Error(error);
+    }
+
+    if (result.status !== 200) {
+      throw new TreasureDataError('サーバーのレスポンスが不正です。');
+    }
+
+    return result.data as TreasureDataGetExecutedWorkflowTasksOutput;
   };
 
   /**
@@ -242,11 +282,7 @@ export class TreasureData {
    * @param {string} secretValue シークレットの値
    * @return {Promise<void>}
    */
-  public setSecret = async (
-    projectName: string,
-    key: string,
-    value: string
-  ): Promise<TreasureDataGetStatusOutput> => {
+  public setSecret = async (projectName: string, key: string, value: string): Promise<void> => {
     const projectId = await this.getProjectId(projectName);
 
     if (projectId === null) {

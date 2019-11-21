@@ -62,7 +62,7 @@ class TreasureData {
          * 指定の Workflow を実行する
          * @param {string} projectName  TreasureData Workflow の対象のプロジェクト名
          * @param {string} workflowName TreasureData Workflow の対象の Workflow 名
-         * @return {Promise<TreasureDataExecuteOutput>}
+         * @return {Promise<TreasureDataExecutedWorkflowOutput>}
          */
         this.executeWorkflow = async (projectName, workflowName) => {
             const projectId = await this.getProjectId(projectName);
@@ -95,13 +95,32 @@ class TreasureData {
         };
         /**
          * 指定した Workflow のステータスを取得する
-         * @param {string} sessionId 指定する Workflow の Session ID
-         * @return {Promise<TreasureDataExecuteOutput>}
+         * @param {string} attemptId 指定する Workflow の Attempt ID
+         * @return {Promise<TreasureDataExecutedWorkflowOutput>}
          */
-        this.getWorkflowStatus = async (sessionId) => {
+        this.getExecutedWorkflowStatus = async (attemptId) => {
             let result;
             try {
-                result = await this.axios.get(`api/sessions/${sessionId}`);
+                result = await this.axios.get(`/api/attempts/${attemptId}`);
+            }
+            catch (error) {
+                console.error(error);
+                throw new Error(error);
+            }
+            if (result.status !== 200) {
+                throw new TreasureDataError('サーバーのレスポンスが不正です。');
+            }
+            return result.data;
+        };
+        /**
+         * 指定した Workflow のステータスを取得する
+         * @param {string} attemptId 指定する Workflow の Attempt ID
+         * @return {Promise<TreasureDataGetExecutedWorkflowTasksOutput>}
+         */
+        this.getExecutedWorkflowTasks = async (attemptId) => {
+            let result;
+            try {
+                result = await this.axios.get(`/api/attempts/${attemptId}/tasks`);
             }
             catch (error) {
                 console.error(error);
