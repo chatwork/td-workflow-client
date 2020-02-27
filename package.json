@@ -9,7 +9,7 @@
     "npm": ">= 6.13.4"
   },
   "scripts": {
-    "lint": "eslint --fix src/*.ts && eslint --fix test/*.ts",
+    "lint": "eslint --fix src/**/*.ts && eslint --fix test/**/*.ts",
     "test": "npm run lint && jest --passWithNoTests --silent=false --verbose false",
     "build": "npm run clean && npm run test && tsc",
     "install": "tsc",
