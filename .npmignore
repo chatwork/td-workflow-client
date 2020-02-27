@@ -3,5 +3,8 @@
 # CI/CD directories
 .circleci/
 
+# Docker directories
+docker/
+
 # Source directories
 test/
