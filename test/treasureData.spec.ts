@@ -14,7 +14,7 @@ const secret: TreasureDataSecret = {
 };
 
 let tdw: TDWorkflow;
-let mockAxios: MockAdapter = null;
+let mockAxios: MockAdapter;
 
 describe('TDWorkflow', () => {
   beforeEach(async () => {

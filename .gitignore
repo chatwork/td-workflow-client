@@ -1,6 +1,5 @@
 .DS_Store
 
-
 # Editor
 .idea/
 .vscode/
@@ -17,6 +16,9 @@ __pycache__/
 *.zip
 *.tar.gz
 *.tgz
+
+# Build directories
+dist/
 
 # Coverage directories
 coverage/

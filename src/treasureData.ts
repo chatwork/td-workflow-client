@@ -2,10 +2,10 @@
 import tar from 'tar';
 import path from 'path';
 import moment from 'moment';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import * as fs from 'fs-extra';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-export interface Option extends AxiosRequestConfig {}
+export type Option = AxiosRequestConfig;
 
 export type TreasureDataSecret = {
   API_TOKEN: string;
@@ -48,7 +48,7 @@ export type TreasureDataGetExecutedWorkflowStatusOutput = {
   sessionId: string;
   sessionUuid: string;
   sessionTime: string;
-  retryAttemptName: string;
+  retryAttemptName: string | null;
   done: boolean;
   success: boolean;
   cancelRequested: boolean;
@@ -87,7 +87,7 @@ export type TreasureDataGetProjectsOutputElement = {
   revision: string;
   createdAt: string;
   updatedAt: string;
-  deletedAt: string;
+  deletedAt: string | null;
   archiveType: string;
   archiveMd5: string;
 };
@@ -313,7 +313,7 @@ export class TreasureData {
    * @param {string} name 指定するプロジェクト名
    * @return {string}     プロジェクト ID。見つからなければ null を返す
    */
-  public getProjectId = async (name: string): Promise<string> => {
+  public getProjectId = async (name: string): Promise<string | null> => {
     let result;
     try {
       result = await this.axios.get('api/projects');
@@ -343,7 +343,7 @@ export class TreasureData {
    * @param {string} projectId workflow が属するプロジェクトの ID
    * @return {string}          workflow の ID。見つからなければ null を返す
    */
-  public getWorkflowId = async (name: string, projectId: string): Promise<string> => {
+  public getWorkflowId = async (name: string, projectId: string): Promise<string | null> => {
     let result;
     try {
       result = await this.axios.get(`api/projects/${projectId}/workflows`);
@@ -421,7 +421,7 @@ export class TreasureData {
    * @param {string} path         srcDirPath 以下のディレクトリパス
    * @return {string[]}           配下のファイルパスの配列
    */
-  private getFileListRecursive = (srcDirPath: string, path: string = ''): string[] => {
+  private getFileListRecursive = (srcDirPath: string, path = ''): string[] => {
     const result: string[] = [];
     const fileObj = fs.readdirSync(`${srcDirPath}/${path}`, { withFileTypes: true });
     fileObj.forEach(file => {
