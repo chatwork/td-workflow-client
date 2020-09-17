@@ -4,13 +4,13 @@ import {
   TreasureData as TDWorkflow,
   TreasureDataSecret,
   TreasureDataGetExecutedWorkflowStatusOutput,
-  TreasureDataGetProjectsOutputElement
+  TreasureDataDeploymentWorkflowOutput,
 } from '../src/treasureData';
 
 jest.unmock('../src/treasureData');
 
 const secret: TreasureDataSecret = {
-  API_TOKEN: 'XXXXXXX'
+  API_TOKEN: 'XXXXXXX',
 };
 
 let tdw: TDWorkflow;
@@ -23,24 +23,22 @@ describe('TDWorkflow', () => {
     mockAxios = new MockAdapter(tdw.getInstance());
   });
 
-  xdescribe('getWorkflowStatus()', () => {
+  describe('getWorkflowStatus()', () => {
     it('Success.', async () => {
-      tdw = new TDWorkflow(secret);
-
       const attemptId = '13472853';
       const result: TreasureDataGetExecutedWorkflowStatusOutput = {
         id: '13472853',
         index: 1,
         project: {
           id: '252525',
-          name: 'hogehoge'
+          name: 'hogehoge',
         },
         workflow: {
           name: 'test_workflow_pj',
-          id: '121212121'
+          id: '121212121',
         },
         sessionId: '12341234',
-        sessionUuid: 'q23r32rq23ro[k[poiu[iag',
+        sessionUuid: 'q23r32rq23ro[k[poiu[iag' /* cspell: disable-line */,
         sessionTime: '2019-11-14T16:07:20+09:00',
         retryAttemptName: null,
         done: true,
@@ -48,14 +46,14 @@ describe('TDWorkflow', () => {
         cancelRequested: false,
         params: {},
         createdAt: '2019-11-14T07:07:10Z',
-        finishedAt: '2019-11-14T07:21:32Z'
+        finishedAt: '2019-11-14T07:21:32Z',
       };
 
       // axios.getをモック
       mockAxios.onGet(`api/attempts/${attemptId}`).reply(200, result);
 
       const response = await tdw.getExecutedWorkflowStatus('13472853');
-      expect(response.sessionUuid).toBe('q23r32rq23ro[k[poiu[iag');
+      expect(response.sessionUuid).toBe('q23r32rq23ro[k[poiu[iag'); /* cspell: disable-line */
     });
   });
 
@@ -69,7 +67,7 @@ describe('TDWorkflow', () => {
 
       const revision = '123456789';
 
-      const dataResult: TreasureDataGetProjectsOutputElement = {
+      const dataResult: TreasureDataDeploymentWorkflowOutput = {
         id: projectId,
         name: 'test-pj',
         revision: '8a44042d-9e0c-4821-a4ef-4813e56816db',
@@ -77,16 +75,17 @@ describe('TDWorkflow', () => {
         updatedAt: '2019-11-06T07:34:13Z',
         deletedAt: null,
         archiveType: 's3',
-        archiveMd5: '5MA/WDRkRij8gyZWwi5wWg=='
+        archiveMd5: '5MA/WDRkRij8gyZWwi5wWg==',
       };
 
       // axios.postをモック
-      mockAxios.onPut(`api/projects?project=${projectName}&revision=${revision}`).reply(200, {
-        status: 200,
-        data: dataResult
-      });
+      mockAxios
+        .onPut(`api/projects?project=${projectName}&revision=${revision}`)
+        .reply(200, dataResult);
 
-      await tdw.deployWorkflow(srcDirPath, zipFilePath, projectName, revision);
+      const response = await tdw.deployWorkflow(srcDirPath, zipFilePath, projectName, revision);
+
+      expect(response).toEqual(dataResult);
     });
   });
 });
