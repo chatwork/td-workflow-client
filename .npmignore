@@ -1,0 +1,13 @@
+.DS_Store
+
+# CI/CD directories
+.circleci/
+
+# Docker directories
+docker/
+
+# Source directories
+test/
+
+# GitHub directories
+.github/

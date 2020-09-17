@@ -12,11 +12,17 @@ jspm_packages
 .venv
 __pycache__/
 
-# Build directories
-dist
-
-# Layer directories
+# Achive Files
 *.zip
+*.tar.gz
+*.tgz
+
+# Build directories
+dist/
 
 # Coverage directories
 coverage/
+
+# Workflow files
+*.dig
+!test/workflows/*.dig

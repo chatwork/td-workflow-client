@@ -1,0 +1,12 @@
+_export:
+  td:
+    dest_db: td_workflow_test
+    dest_table: testtable001
+
++test_echo:
+  echo>: "test task is running."
+
++test_db_connect:
+  td_load>: config1.yml
+  database: ${td.dest_db}
+  table: ${td.dest_table}
