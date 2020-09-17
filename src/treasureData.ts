@@ -29,7 +29,7 @@ export type TreasureDataExecutedWorkflowOutput = {
   done: boolean;
   success: boolean;
   cancelRequested: boolean;
-  params: object;
+  params: unknown;
   createdAt: string; //  ISO8601 format
   finishedAt: string; // ISO8601 format
 };
@@ -52,7 +52,7 @@ export type TreasureDataGetExecutedWorkflowStatusOutput = {
   done: boolean;
   success: boolean;
   cancelRequested: boolean;
-  params: object;
+  params: unknown;
   createdAt: string;
   finishedAt: string;
 };
@@ -60,17 +60,17 @@ export interface TreasureDataGetExecutedWorkflowTasksOutputElement {
   id: string;
   fullName: string;
   parentId: string;
-  config: object; // Workflow ごとに設定内容は異なる
+  config: unknown; // Workflow ごとに設定内容は異なる
   upstreams: string[];
   state: string;
   cancelRequested: false;
-  exportParams: object; // Workflow ごとに設定内容は異なる
-  storeParams: object;
-  stateParams: object;
+  exportParams: unknown; // Workflow ごとに設定内容は異なる
+  storeParams: unknown;
+  stateParams: unknown;
   updatedAt: string; //  ISO8601 format
   retryAt: string; //  ISO8601 format
   startedAt: string; //  ISO8601 format
-  error: object;
+  error: unknown;
   isGroup: boolean;
 }
 export interface TreasureDataGetExecutedWorkflowTasksOutput {
@@ -92,6 +92,8 @@ export type TreasureDataGetProjectsOutputElement = {
   archiveMd5: string;
 };
 
+export type TreasureDataDeploymentWorkflowOutput = TreasureDataGetProjectsOutputElement;
+
 type TreasureDataGetWorkflowsOutput = {
   workflows: TreasureDataGetWorkflowsOutputElement[];
 };
@@ -105,7 +107,7 @@ type TreasureDataGetWorkflowsOutputElement = {
   };
   revision: string;
   timezone: string;
-  config: object;
+  config: unknown;
 };
 
 class TreasureDataError extends Error {}
@@ -124,8 +126,8 @@ export class TreasureData {
       headers: {
         AUTHORIZATION: `TD1 ${secret.API_TOKEN}`,
         'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
+        Accept: 'application/json',
+      },
     };
 
     this.axios = axios.create(this.option);
@@ -148,7 +150,7 @@ export class TreasureData {
     zipFilePath: string,
     projectName: string,
     revision?: string
-  ): Promise<TreasureDataExecutedWorkflowOutput> => {
+  ): Promise<TreasureDataGetProjectsOutputElement> => {
     const gzipData = await this.gzipDigFile(srcDirPath, zipFilePath);
 
     if (revision === undefined) {
@@ -163,8 +165,8 @@ export class TreasureData {
           AUTHORIZATION: this.option.headers['AUTHORIZATION'],
           'Content-Type': 'application/gzip',
           'Content-Encoding': 'gzip',
-          Accept: 'application/json'
-        }
+          Accept: 'application/json',
+        },
       };
 
       result = await this.axios.put(
@@ -181,7 +183,7 @@ export class TreasureData {
       throw new TreasureDataError('サーバーのレスポンスが不正です。');
     }
 
-    return result.data as TreasureDataExecutedWorkflowOutput;
+    return result.data as TreasureDataGetProjectsOutputElement;
   };
 
   /**
@@ -207,11 +209,9 @@ export class TreasureData {
     }
 
     const params = {
-      sessionTime: moment()
-        .add(10, 'second')
-        .toISOString(),
+      sessionTime: moment().add(10, 'second').toISOString(),
       workflowId: workflowId,
-      params: {}
+      params: {},
     };
 
     let result;
@@ -290,7 +290,7 @@ export class TreasureData {
     }
 
     const param = {
-      value: value
+      value: value,
     };
 
     let result;
@@ -328,7 +328,7 @@ export class TreasureData {
 
     const json = result.data as TreasureDataGetProjectsOutput;
 
-    const filtered = json.projects.filter(item => item.name === name);
+    const filtered = json.projects.filter((item) => item.name === name);
 
     if (filtered.length === 0) {
       return null;
@@ -358,7 +358,7 @@ export class TreasureData {
 
     const json = result.data as TreasureDataGetWorkflowsOutput;
 
-    const filtered = json.workflows.filter(item => item.name === name);
+    const filtered = json.workflows.filter((item) => item.name === name);
 
     if (filtered.length === 0) {
       return null;
@@ -393,7 +393,7 @@ export class TreasureData {
           gzip: true,
           cwd: srcDirPath,
           file: zipFilePath,
-          portable: true
+          portable: true,
         },
         fileList
       );
@@ -424,12 +424,12 @@ export class TreasureData {
   private getFileListRecursive = (srcDirPath: string, path = ''): string[] => {
     const result: string[] = [];
     const fileObj = fs.readdirSync(`${srcDirPath}/${path}`, { withFileTypes: true });
-    fileObj.forEach(file => {
+    fileObj.forEach((file) => {
       if (file.isDirectory()) {
         this.getFileListRecursive(
           srcDirPath,
           path === '' ? file.name : `${path}/${file.name}`
-        ).forEach(item => {
+        ).forEach((item) => {
           result.push(item);
         });
       } else {
