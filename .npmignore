@@ -8,3 +8,6 @@ docker/
 
 # Source directories
 test/
+
+# GitHub directories
+.github/
